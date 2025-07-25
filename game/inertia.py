@@ -1,6 +1,6 @@
-# 10x8:gbwwgmwmgbbgbgmswmsssmsbSwgbsmgwggmbbwswssbmwmwmmbbwmgwsswmggmsssmswbggbwgwgbbsm
 from enum import Enum
 from json import dumps
+from random import choices, randint
 
 class FieldType(Enum):
     GEM = 'g'
@@ -11,7 +11,7 @@ class FieldType(Enum):
     WALL = 'w'
     STOP = 's'
 
-class Moves(Enum):
+class Moves(str, Enum):
     SW = 1
     S = 2
     SE = 3
@@ -41,7 +41,6 @@ class Inertia:
         return int(x), int(y), board
 
     def _check_down(self, coord: int) -> bool:
-        print(f'{coord} + {self.width} < {self.field}')
         return coord + self.width < self.field
 
     def _check_left(self, coord: int) -> bool:
@@ -49,23 +48,6 @@ class Inertia:
 
     def _check_right(self, coord: int) -> bool:
         return coord % self.width != self.width - 1
-
-    def _check_state(self) -> str:
-        self.actual_gems = self.board.count('g')
-        state = 'GO'
-        if len(self.coord_set) != self.last_coors_set_len:
-            self.dead_end = 0
-        else:
-            self.dead_end += 1
-        if self.dead_end >= self.gems_max:
-            state = 'END'
-        if 'S' not in self.board and 'B' not in self.board:
-            state = 'END'
-        if 'g' not in self.board:
-            state = 'WIN'
-
-
-        return  dumps({'state': state, 'actual_gems': self.actual_gems, 'max_gems': self.gems_max, 'map': self.board})
 
     def _check_top(self, coord: int) -> bool:
         return coord - self.width >= 0
@@ -84,18 +66,15 @@ class Inertia:
 
     def _move_exec(self, old_coord: int, new_coord: int, last_move: Moves) -> None:
         board = list(self.board)
-        print(f'move {old_coord} to {new_coord}, {last_move} with {board[new_coord]}, {board}')
         match board[new_coord]:
             case FieldType.GEM.value | FieldType.BOLD.value:
                 self.board = ''.join(self._move_ball(old_coord, new_coord, board))
                 self.move(last_move)
             case FieldType.STOP.value:
                 self.board = ''.join(self._move_ball(old_coord, new_coord, board))
-
             case FieldType.WALL.value:
                 pass
             case FieldType.MINE.value:
-                print(f'{new_coord=} -> {last_move=}')
                 board = self._move_ball(old_coord, new_coord, board)
                 board[new_coord] = FieldType.BOLD.value
                 self.board = ''.join(board)
@@ -107,8 +86,25 @@ class Inertia:
             board.insert(coord, '\n')
         return ''.join(board)
 
+    def check_state(self) -> dict[str, str]:
+        self.actual_gems = self.board.count('g')
+        state = 'GO'
+        if len(self.coord_set) != self.last_coors_set_len:
+            self.dead_end = 0
+            self.last_coors_set_len = len(self.coord_set)
+        else:
+            self.dead_end += 1
+        if self.dead_end >= self.gems_max:
+            state = 'END'
+        if 'S' not in self.board and 'B' not in self.board:
+            state = 'END'
+        if 'g' not in self.board:
+            state = 'WIN'
 
-    def move(self, move: Moves) -> str:
+        return  {'state': state, 'actual_gems': self.actual_gems, 'max_gems': self.gems_max, 'map': self.board}
+
+
+    def move(self, move: Moves) -> dict[str, str]:
         coord = self.board.find('S')
         if coord == -1:
             coord = self.board.find('B')
@@ -140,5 +136,21 @@ class Inertia:
                 if self._check_left(coord):
                     self._move_exec(coord, coord - 1, Moves.W)
 
-        return self._check_state()
+        return self.check_state()
+
+    @classmethod
+    def map_generator(cls, x: int, y: int):
+        game = [str(x) + 'x' + str(y)+':']
+        field_list = [f.value for f in FieldType]
+        field_list.remove('S')
+        field_list.remove('B')
+        start = choices(['B', 'S'], k = 1)[0]
+        size = x * y - 1
+        insert_index = randint(0, size)
+        fi = choices(field_list, k = size)
+        fi.insert(insert_index, start)
+        game.extend(fi)
+        return ''.join(game)
+
+
 

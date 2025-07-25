@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pyautogui = '*'
 
 [dev-packages]
 pytest = "*"
@@ -12,3 +13,6 @@ pytest-cov = "*"
 [requires]
 python_version = "3.13"
 python_full_version = "3.13.1"
+
+[scripts]
+random = "./scripts/random"
