@@ -18,14 +18,14 @@ def test_check_state_win():
     # Simulate a state with no gems
     game.board = game.board.replace("g", "b")
     result = game.check_state()
-    assert '"state": "WIN"' in result
+    assert result['state'] == 'WIN'
 
 def test_check_state_end_by_no_start_or_ball():
     board = TEST_BOARD
     game = Inertia(board)
     game.board = board.replace("S", "b").replace("B", "b")
     result = game.check_state()
-    assert '"state": "END"' in result
+    assert result['state'] == 'END'
 
 def test_check_state_dead_end_triggers_end():
     board = TEST_BOARD
@@ -33,13 +33,12 @@ def test_check_state_dead_end_triggers_end():
     game.dead_end = game.gems_max  # simulate dead end
     game.last_coors_set_len = len(game.coord_set)
     result = game.check_state()
-    assert '"state": "END"' in result
+    assert result['state'] == 'END'
 
 def test_move_game_ended():
     game = Inertia("3x3:bbbgbbbbb")
     with pytest.raises(EOFError):
         game.move(Moves.E)
-
 
 def test_invalid_board():
     with pytest.raises(ValueError):
