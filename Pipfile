@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 pyautogui = '*'
+xdotool = '*'
+pyperclip = '*'
 
 [dev-packages]
 pytest = "*"
