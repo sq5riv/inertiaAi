@@ -34,16 +34,15 @@ class InertiaRemote:
     def __enter__(self):
         return self
     def __exit__(self, exc_type, exc_val, exc_tb):
-        sleep(10)
-        subprocess.run(
-            ['kill', f'{self.ipid}']
-        )
+        self.close()
+
     def _get_inertia_window(self) -> None:
         if os.environ.get("XDG_SESSION_TYPE") != 'x11':
             raise EnvironmentError("This script must be run in an X11 session")
         self.ipid = str(subprocess.Popen(["sgt-inertia"]).pid)
         sleep(self.delays)
-        while True:
+        window_ids = None
+        for i in range(5):
             result = subprocess.run(
                 ["xdotool", "search", "--pid", self.ipid], # "--class", "Inertia"],
                 capture_output=True,
@@ -51,6 +50,7 @@ class InertiaRemote:
                 check=True
             )
             window_ids = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+            window_ids.reverse()
             print(f"{window_ids=}")
             for win_id in window_ids:
                 sleep(self.delays)
@@ -89,6 +89,12 @@ class InertiaRemote:
         if window_id != self.window_id:
             raise RuntimeError(f"window id: {window_id} != {self.window_id}")
 
+    def close(self):
+        sleep(10)
+        subprocess.run(
+            ['kill', f'{self.ipid}']
+        )
+
     def new_game(self) -> None:
         self._activate_inertia_window()
         press('N')
@@ -105,7 +111,7 @@ class InertiaRemote:
         press('Enter')
         hotkey('ctrlleft', 'c')
         self.state = pyperclip.paste()
-        print(f'Copied {self.state}')
+        #print(f'Copied {self.state}')
         press('Enter')
 
     def set_game(self, game: str) -> None:
