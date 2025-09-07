@@ -29,6 +29,7 @@ class InertiaRemote:
         self._get_inertia_window()
 
         self.get_specific()
+        self.set_game('3x3:Sgggggggm')
 
 
     def __enter__(self):
@@ -111,11 +112,23 @@ class InertiaRemote:
         press('Enter')
         hotkey('ctrlleft', 'c')
         self.state = pyperclip.paste()
-        #print(f'Copied {self.state}')
+        print(f'Copied {self.state}')
         press('Enter')
 
     def set_game(self, game: str) -> None:
         self._activate_inertia_window()
+        sleep(self.delays)
+        keyDown('altleft')
+        keyDown('g')
+        keyUp('altleft')
+        keyUp('g')
+        press('Down')
+        press('Down')
+        press('Enter')
+        self.state = pyperclip.copy(game)
+        hotkey('ctrlleft', 'v')
+        # print(f'Copied {self.state}')
+        press('Enter')
 
     def move(self, direction: Moves) -> None:
         self._activate_inertia_window()

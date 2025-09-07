@@ -1,7 +1,10 @@
-from setuptools import setup
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
-setup(
-    name="inertia",
-    version="0.1",
-    packages=["game"],
-)
+[project]
+name = "inertia"
+version = "0.1.0"
+
+[tool.setuptools]
+packages = ["game"]

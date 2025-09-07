@@ -1,0 +1,8 @@
+pyproject.toml
+game/__init__.py
+game/inertia.py
+inertia.egg-info/PKG-INFO
+inertia.egg-info/SOURCES.txt
+inertia.egg-info/dependency_links.txt
+inertia.egg-info/top_level.txt
+tests/testscript.py

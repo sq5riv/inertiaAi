@@ -1,5 +1,7 @@
 from enum import Enum
 from random import choices, randint
+from typing import Union
+
 
 class FieldType(Enum):
     GEM = 'g'
@@ -96,18 +98,18 @@ class Inertia:
             board.insert(coord, '\n')
         return ''.join(board)
 
-    def check_state(self) -> dict[str, str]:
+    def check_state(self) -> dict[str, Union[GameState|str|int]]:
         self.actual_gems = self.board.count('g')
-        state = 'GO'
+        state = GameState.GO
         if 'S' not in self.board and 'B' not in self.board:
-            state = 'END'
+            state = GameState.END
         if 'g' not in self.board:
-            state = 'WIN'
+            state = GameState.WIN
 
-        return  {'state': state, 'actual_gems': self.actual_gems, 'max_gems': self.gems_max, 'map': self._board_code()}
+        return {'state': state, 'actual_gems': self.actual_gems, 'max_gems': self.gems_max, 'map': self._board_code()}
 
 
-    def move(self, move: Moves) -> dict[str, str]:
+    def move(self, move: Moves) -> dict[str, Union[GameState|str|int]]:
         coord = self.board.find('S')
         if coord == -1:
             coord = self.board.find('B')

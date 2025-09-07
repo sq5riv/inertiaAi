@@ -7,10 +7,12 @@ name = "pypi"
 pyautogui = '*'
 xdotool = '*'
 pyperclip = '*'
+inertia = {file = ".", editable = true}
 
 [dev-packages]
 pytest = "*"
 pytest-cov = "*"
+
 
 [requires]
 python_version = "3.13"

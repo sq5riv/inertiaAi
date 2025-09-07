@@ -62,7 +62,6 @@ def test_mine():
     game.move(Moves.SW)
     assert game.board == 'bbbgswbbb'
 
-
 def test_wall():
     game = Inertia(TEST_BOARD2)
     game.move(Moves.E)
