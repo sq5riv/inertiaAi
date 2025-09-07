@@ -1,5 +1,4 @@
 from enum import Enum
-from json import dumps
 from random import choices, randint
 
 class FieldType(Enum):
@@ -11,7 +10,7 @@ class FieldType(Enum):
     WALL = 'w'
     STOP = 's'
 
-class Moves(str, Enum):
+class Moves(Enum):
     SW = 1
     S = 2
     SE = 3
@@ -20,6 +19,11 @@ class Moves(str, Enum):
     NW = 7
     N = 8
     NE = 9
+
+class GameState(Enum):
+    GO = 'Go'
+    END = 'End'
+    WIN = 'Win'
 
 class Inertia:
     def __init__(self, board: str) -> None:
@@ -39,6 +43,9 @@ class Inertia:
         if x * y != len(board):
             raise ValueError(f"Invalid board: {board}")
         return int(x), int(y), board
+
+    def _board_code(self) -> str:
+        return f'{self.width}x{self.height}:{self.board}'
 
     def _check_down(self, coord: int) -> bool:
         return coord + self.width < self.field
@@ -80,6 +87,9 @@ class Inertia:
                 self.board = ''.join(board)
         self.coord_set.add(old_coord)
 
+    def get_gem_number(self):
+        return self.actual_gems
+
     def get_human_board(self) -> str:
         board = list(self.board)
         for coord in range(len(board), 0, -self.width):
@@ -89,19 +99,12 @@ class Inertia:
     def check_state(self) -> dict[str, str]:
         self.actual_gems = self.board.count('g')
         state = 'GO'
-        if len(self.coord_set) != self.last_coors_set_len:
-            self.dead_end = 0
-            self.last_coors_set_len = len(self.coord_set)
-        else:
-            self.dead_end += 1
-        if self.dead_end >= self.gems_max:
-            state = 'END'
         if 'S' not in self.board and 'B' not in self.board:
             state = 'END'
         if 'g' not in self.board:
             state = 'WIN'
 
-        return  {'state': state, 'actual_gems': self.actual_gems, 'max_gems': self.gems_max, 'map': self.board}
+        return  {'state': state, 'actual_gems': self.actual_gems, 'max_gems': self.gems_max, 'map': self._board_code()}
 
 
     def move(self, move: Moves) -> dict[str, str]:
