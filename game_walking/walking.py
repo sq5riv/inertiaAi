@@ -32,6 +32,10 @@ class Walk:
         self.resolve()
 
     def resolve(self):
+        """
+        State machine to resolve inertia puzzle
+        :return:
+        """
         okgo = True
         state = States.FORWARD
         while okgo:
@@ -45,6 +49,23 @@ class Walk:
             elif state == States.STACK:
                 state = self.stack()
                 okgo = False
+
+    def is_looped(self, game_state: str, num_diamonds: int)-> bool:
+        """
+        Checks if game is not looped. If we are in the same state more than 5 times game is looped.
+        :param game_state: State of game
+        :param num_diamonds: Number of diamonds to win
+        :return: True if game is looped, False otherwise
+        """
+        place_counter = 0
+        for step in self.steps[::-1]:
+            if step.number_of_diamonds<num_diamonds:
+                return False
+            if step.game_state == game_state:
+                place_counter += 1
+            if place_counter > 3:
+                return True
+        return False
 
     def forward(self) -> States:
         if len(self.steps) == 0:
@@ -60,11 +81,13 @@ class Walk:
         elif game_dict['state'] == GameState.END:
             return States.FORWARD
         elif game_dict['state'] == GameState.GO:
-            # ToDo add stack check.
+            if step.game_state == game_dict['map']:
+                return States.FORWARD
+            if self.is_looped():
+                return States.BACK
             self.steps.append(WalkState(game_state = self.board, number_of_diamonds=game_dict['actual_gems']))
             return States.FORWARD
         return States.FORWARD
-
 
     def backward(self) -> States:
         self.steps.pop(-1)
@@ -73,3 +96,5 @@ class Walk:
         return True
     def win(self) -> States:
         return True
+
+
