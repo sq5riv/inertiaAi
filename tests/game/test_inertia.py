@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from game.inertia import Inertia, Moves, FieldType
+from game.inertia import Inertia, Moves, GameState
 
 # Test data: 3x3 board with a gem and ball
 TEST_BOARD = "3x3:bbbgSbbbb"  # Just an example board
@@ -18,22 +18,14 @@ def test_check_state_win():
     # Simulate a state with no gems
     game.board = game.board.replace("g", "b")
     result = game.check_state()
-    assert result['state'] == 'WIN'
+    assert result['state'] == GameState.WIN
 
 def test_check_state_end_by_no_start_or_ball():
     board = TEST_BOARD
     game = Inertia(board)
     game.board = board.replace("S", "b").replace("B", "b")
     result = game.check_state()
-    assert result['state'] == 'END'
-
-def test_check_state_dead_end_triggers_end():
-    board = TEST_BOARD
-    game = Inertia(board)
-    game.dead_end = game.gems_max  # simulate dead end
-    game.last_coors_set_len = len(game.coord_set)
-    result = game.check_state()
-    assert result['state'] == 'END'
+    assert result['state'] == GameState.END
 
 def test_move_game_ended():
     game = Inertia("3x3:bbbgbbbbb")

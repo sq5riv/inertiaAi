@@ -99,6 +99,10 @@ class Inertia:
         return ''.join(board)
 
     def check_state(self) -> dict[str, Union[GameState|str|int]]:
+        """
+        Check the current state of the game
+        :return: A dict with game state, number of gems, number of gems onstart and board state.
+        """
         self.actual_gems = self.board.count('g')
         state = GameState.GO
         if 'S' not in self.board and 'B' not in self.board:
